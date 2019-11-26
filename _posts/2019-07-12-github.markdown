@@ -1,7 +1,7 @@
 ---
 title:  "Using Github"
 date:   2019-07-03
-permalink: 
+permalink: /_posts/
 ---
 
 Beginning github
