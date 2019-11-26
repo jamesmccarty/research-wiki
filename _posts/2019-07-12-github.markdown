@@ -1,0 +1,67 @@
+---
+layout: post
+title:  "Using Github"
+date:   2019-07-03
+permalink: "/"
+---
+
+Beginning github
+
+### Creating Repositories
+
+You can create a new local repository with the specified name
+{% highlight git %}
+$ git init [project-name]
+{% endhighlight %}
+
+Or you can download an existing project and its entire version history
+{% highlight git %}
+$ git clone [url]
+{% endhighlight %}
+
+### Making Changes: Review edits and craft a commit transaction
+
+To show the differences between your local copy and the github version
+{% highlight git %}
+$ git status
+{% endhighlight %}
+
+``Untracked file`` is a file that is not yet committed to the master branch. To add the file to the list of files to be merged with master, use git add.
+{% highlight git %}
+$ git add [file-name]
+{% endhighlight %}
+Instead of a file name, the flag ``-A`` can be used for ``all``
+
+Now the new file is in the project and can be committed to the master branch. Currently, its status is ``Change to be committed``
+
+To commit changes
+{% highlight git %}
+$ git commit –m [added new file]
+{% endhighlight %}
+where the ``-m`` indicates a message regarding the changes to commit. The file is now added to the repository, but only locally. To sync changes to github
+{% highlight git %}
+$ git push
+{% endhighlight %}
+This takes everything from your machine and pushes it to github branch.
+
+### Updating everything
+
+To grab online updates and merges them with your local work
+
+{% highlight git %}
+$ git pull
+{% endhighlight %}
+
+``git pull`` is a convenient shortcut for completing both ``git fetch`` and ``git merge`` in the same command:
+
+{% highlight git %}
+$ git fetch
+{% endhighlight %}
+
+Fetches updates made to a remote repository, and
+
+{% highlight git %}
+$ git merge origin
+{% endhighlight %}
+
+Merges updates made online with your local work
