@@ -1,5 +1,4 @@
 ---
-layout: post
 title:  "Using Github"
 date:   2019-07-03
 permalink: "/"
