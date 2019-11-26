@@ -1,7 +1,6 @@
 ---
 title:  "Using Github"
 date:   2019-07-03
-layout: "git-wiki-post"
 ---
 
 Beginning github
