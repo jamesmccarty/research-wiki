@@ -1,5 +1,5 @@
 ---
-title:  "Protein-Ligan Complex"
+title:  "Protein-Ligand Complex"
 date:   2019-07-03
 layout: "git-wiki-post"
 ---
