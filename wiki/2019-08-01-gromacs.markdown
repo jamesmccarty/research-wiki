@@ -22,7 +22,7 @@ $ gmx pdb2gmx –f 1ubq.pdb –o 1ubq.gro -p 1ubq.top –ignh
 
 where -f signals the input pdb file, here called 1ubq.pdb and -o is the output structure file and -p is the output topology file. The flag -ignh means to ignore H atoms in the PDB file. The -ignh flag is useful to deal with non-conventional naming of H atoms in pdb files; however, if you need to persevere the exact position of the H coordinates in the structure file, then you should not use the -ignh flag.
 
-Typing the above command will prompt you to select a force field. Select the force field by typing the appropriate number and hitting the *Enter/Return* key. You will also be prompted to select a water model. For this tutorial select the AMBER99SB-ILDN fore fields from Lindorff-Larsen et al., Proteins 78, 1950-58, 2010, and when prompted, select the TIP3P water model. You should now have generated a structure file *1ubq.gro*, a topology file *1ubq.top*, and a position restraint file *posre.itp*.
+Typing the above command will prompt you to select a force field. Select the force field by typing the appropriate number and hitting the *Enter/Return* key. You will also be prompted to select a water model. For this tutorial select the AMBER99SB-ILDN force fields from [Lindorff-Larsen et al., Proteins 78, 1950-58, 2010](https://onlinelibrary.wiley.com/doi/full/10.1002/prot.22711), and when prompted, select the TIP3P water model. You should now have generated a structure file *1ubq.gro*, a topology file *1ubq.top*, and a position restraint file *posre.itp*.
 
 The topology file *1ubq.top* contains all the information necessary to define the molecule within a simulation. This information includes nonbonded parameters (atom types and charges) as well as bonded parameters (bonds, angles, and dihedrals).
 
@@ -86,6 +86,12 @@ At the prompt, select "10" for the potential energy, and then hit "0" to termina
 xmgrace potential.xvg
 {% endhighlight %}
 
+A plot of the potential energy is shown below:
+
+![]({{ site.url }}{{ site.baseurl }}/images/potential.png){: style="width: 600px; border: 10px"}
+
+To verify the energy minimization was successful, the potential energy in (kJ/mol) should be negative, and (for a simple protein in water) on the order of –10<sup>5</sup> to –10<sup>6</sup>, depending on the system size and number of water molecules.
+
 ### Equilibration Run 1
 
 Energy minimization from above optimizes the local geometry and solvent orientation. Before we can run a long MD trajectory, we still need to equilibrate the solvent molecules and ions around the protein at the temperature we wish to simulate. For the first phase of equilibration we will use an NVT ensemble (constant number of particles, volume and temperature). We will perform a short (100 ps) simulation with the protein positions restrained. Position restraints thus allow us to equilibrate the solvent around the protein, without causing significant structural changes in the protein. The restraint parameters are contained in the *posre.itp* file. Again we use a .mdp file containing the parameters for the simulation. These parameters are specified in the file [nvt.mdp](https://github.com/jamesmccarty/GROMACS_parameter_files/blob/master/nvt.mdp) file.
@@ -127,6 +133,12 @@ Type "16 0" at the prompt to select the temperature of the system and exit. You 
 xmgrace temperature.xvg
 {% endhighlight %}
 
+A plot of the temperature is shown below:
+
+![]({{ site.url }}{{ site.baseurl }}/images/temperature.png){: style="width: 600px; border: 10px"}
+
+Here we can see that over the course of the 1 ps equilibration run, the temperature is fluctuating around 300 K as expected.
+
 ### Additional Equilibration Runs
 
 The previous step, NVT equilibration, stabilized the temperature of the system. If we want to perform the simulation in the NVT ensemble at a particular density, we also need to perform an equilibration in the NPT ensemble at a specified temperature and pressure to allow the system density to reach its equilibrated value. This can be done using the mdp file [npt.mdp](https://github.com/jamesmccarty/GROMACS_parameter_files/blob/master/npt.mdp)
@@ -159,7 +171,17 @@ When the run is finished you can analyze the pressure fluctuations
 gmx energy -f npt.edr -o pressure.xvg
 {% endhighlight %}
 
-Type "17 0" at the prompt to select the temperature of the system and exit. You can view the temperature progression using xmgrace. The instantaneous pressure value fluctuates widely over the course of the equilibration run, but this behavior is not unexpected. (Why do you think the instantaneous pressure fluctuates so much?) Over the course of the equilibration, the average value of the pressure is around 1 bar.
+Type "17 0" at the prompt to select the pressure of the system and exit. View the pressure progression using xmgrace
+
+{% highlight git %}
+xmgrace pressure.xvg
+{% endhighlight %}
+
+A plot of the pressure is shown below:
+
+![]({{ site.url }}{{ site.baseurl }}/images/pressure.png){: style="width: 600px; border: 10px"}
+
+The instantaneous pressure value fluctuates widely over the course of the equilibration run, but this behavior is not unexpected. (Why do you think the instantaneous pressure fluctuates so much?) Over the course of the equilibration, the average value of the pressure is around 1 bar.
 
 Often you will perform several equilibration steps to reach the desired target ensemble. Some common equilibration work-flows are show below. This figure taken from [LivingJ.Comp.Mol.Sci.2019,1(1),5957](https://doi.org/10.33011/livecoms.1.1.5957)
 
@@ -169,7 +191,16 @@ Often you will perform several equilibration steps to reach the desired target e
 
 Once the system has been equilibrated we can run a longer production run. Here we will perform the simulation in the NVT ensemble using the following mdp file [production_nvt.mdp](https://github.com/jamesmccarty/GROMACS_parameter_files/blob/master/production_nvt.mdp)
 
-We use the grompp command:
+in the *production_nvt.mdp* file we have extended the simulation time to 5 ns:
+
+{% highlight git %}
+nsteps		= 2500000	; 2 * 2500000 = 50000 ps (5 ns)
+dt		    = 0.002		; 2 fs
+{% endhighlight %}
+
+This is a short production run for this tutorial. For an actual production run, you would need to run the simulation for much longer.
+
+Again, we use the grompp command:
 
 {% highlight git %}
 gmx grompp -f production_nvt.mdp -c npt.gro -p 1ubq.top -o production_nvt.tpr -r npt.gro
@@ -181,4 +212,4 @@ where *npt.gro* is the final structure from the above npt equilibration. And we 
 gmx mdrun -v -deffnm production_nvt
 {% endhighlight %}
 
-This may take some time if running on a personal PC. Once it is finished you can check out the Analyzing trajectory tutorial.
+This may take some time if running on a personal PC. Once it is finished you can check out the Analyzing a MD trajectory tutorial.
