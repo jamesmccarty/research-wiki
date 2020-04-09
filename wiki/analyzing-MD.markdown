@@ -160,4 +160,4 @@ An example visualization of the first principal components is shown below.
 
 ![]({{ site.url }}{{ site.baseurl }}/images/ev11.png){: style="width: 600px; border: 10px"}
 
-As we can see, this “principal” motion corresponds to the fluctuations of the C-terminus tail. In ubiquitination, the ubiquitin molecule covalently binds through its C-terminal carboxylate group to a particular lysine, cysteine, serine, threonine or N-terminus of the target protein. We see that the dynamics of the C-terminus is thus related to the proteins biological function.
+As we can see, this “principal” motion corresponds to the fluctuations of the C-terminus tail. In ubiquitination, the ubiquitin molecule covalently binds through its C-terminal carboxylate group to a particular lysine, cysteine, serine, threonine or N-terminus of the target protein. We see that the dynamics of the C-terminus is thus related to the biological function.
