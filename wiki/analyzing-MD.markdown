@@ -140,7 +140,7 @@ An example plot is shown here:
 
 ![]({{ site.url }}{{ site.baseurl }}/images/eigenvalues.png){: style="width: 600px; border: 10px"}
 
-In the above example, we see that most of the eigenvalues of very close to zero and that most of the motion can be described by only the first two eigenvectors. As we shall see, this motion correspond to the C-terminus tail fluctuations as seen in the large RMSF values above.
+In the above example, we see that most of the eigenvalues are close to zero and that most of the motion can be described by only the first two eigenvectors. As we shall see, this motion correspond to the C-terminus tail fluctuations as seen in the large RMSF values above.
 
 To see what the collective motions are that correspond to the eigenvectors we use the tool *anaeig*. Here we will look at just the first eigenvector corresponding to the largest eigenvalue. Issue the following command:
 
