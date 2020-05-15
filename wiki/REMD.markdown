@@ -3,6 +3,24 @@ title:  "Replica Exchange MD"
 date:   2019-07-03
 layout: "git-wiki-post"
 ---
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
+
+<script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+        tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true},
+        jax: ["input/TeX","input/MathML","input/AsciiMath","output/CommonHTML"],
+        extensions: ["tex2jax.js","mml2jax.js","asciimath2jax.js","MathMenu.js","MathZoom.js","AssistiveMML.js", "[Contrib]/a11y/accessibility-menu.js"],
+        TeX: {
+        extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"],
+        equationNumbers: {
+        autoNumber: "AMS"
+        }
+        }
+        });
+</script>
 
 Running and and analyzing multi-replica simulations in GROMACS with PLUMED2
 
@@ -11,6 +29,18 @@ Running and and analyzing multi-replica simulations in GROMACS with PLUMED2
 In this tutorial we will use GROMACS patched with PLUMED2 to run simulations with multiple replicas and analyze them. In particular, we will focus on parallel tempering (PT) where the replicas are run at different temperatures. This tutorial was created using GROMACS-2019.4 and PLUMED2.7.0 compiled with mpi. As an example we will set up a REMD simulation of alanine dipeptide in vacuum and calculate free energies from the simulation. This tutorial is based on the [Belfast tutorial](https://www.plumed.org/doc-v2.6/user-doc/html/belfast-7.html) as part of the suite of PLUMED2 tutorials.
 
 ### Summary of theory
+
+In [replica exchange molecular dynamics](http://quantum.ch.ntu.edu.tw/ycclab/wp-content/uploads/2015/02/453329A1-3480-4384-9C4E-E5FBC582A55C.pdf) (REMD), several non-interacting replicas of the same system are run in parallel according to a different Hamiltonian. At fixed intervals, an exchange of configurations between two replicas is attempted. A popular case of REMD is parallel tempering (PT), in which different replicas of the system are simulated using the same potential energy function, but at increasing temperatures in order to accelerate sampling of phase space. The basic idea is that the high temperature replicas will sample phase space more efficienty due to the increased thermal energy, which these replicas from getting trapped in local minima. In a PT simulation, exchanges are periodically attempted between replicas at adjacent temperatures according to the following acceptance probability:
+
+$$ \begin{equation} \label{EQ:1} p(i \rightarrow j) = min\{ 1,e^{\Delta^{PT}_{i,j}}\}\end{equation} $$
+
+with
+
+$$ \begin{equation}\label{EQ:2} \Delta^{PT}_{i,j} =\left( \frac{1}{k_BT_i}-\frac{1}{k_BT_j}\right)\left(U(R_i)-U(R_j)\right) \end{equation} $$
+
+where $$ R_i $$ and $$ R_j $$ are the configurations at temperature $$ T_i $$ and $$ T_j $$, respectively.
+
+The acceptance probability is determined by the overlap between the energy distributions of two replicas. An efficient diffusion in temperature space is necessary to to ensure an adequate configurational sampling, and this in turn requires an overlap between the energy distributions of two replicas. The number of temperatures needed to cover a given temperature range scales as the square root of the number of degrees of freedom, making this approach prohibitively expensive for large systems.
 
 ### Setup and run a PT simulation
 
