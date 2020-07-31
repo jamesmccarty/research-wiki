@@ -1,8 +1,9 @@
 ---
 title:  "Replica Exchange MD"
-date:   2019-07-03
+date:   2020-07-03
 layout: "git-wiki-post"
 ---
+
 <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
 
@@ -22,7 +23,9 @@ layout: "git-wiki-post"
         });
 </script>
 
-Running and and analyzing multi-replica simulations in GROMACS with PLUMED2
+## Replica Exchange Molecular Dynamics (REMD) ##
+
+Running and analyzing multi-replica simulations in GROMACS with PLUMED2  
 
 ### About this tutorial
 

@@ -22,6 +22,8 @@ layout: "git-wiki-post"
         });
 </script>
 
+## Umbrella Sampling 
+
 Umbrella sampling and weighted histogram analysis (WHAM) in GROMACS with PLUMED2
 
 ### About this tutorial ###

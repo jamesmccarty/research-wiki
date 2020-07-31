@@ -4,11 +4,18 @@ date:   2019-07-03
 layout: "git-wiki-post"
 ---
 
+## Protein-Ligand Complex ##
+
 CDK5/(R)-roscovitine Complex
 
 ### About this tutorial ###
 
 In this tutorial we will use the Antechamber package of [AmberTools](https://ambermd.org/AmberTools.php) to create topology and structure files that can be used in a [GROMACS molecular dynamics simulation](2019-08-01-gromacs). The [Generalized Amber Force Fields (GAFF)](http://ambermd.org/antechamber/gaff.html) are a general set of force field parameters to describe small organic molecules such as drugs. In this tutorial we will parameterize the small molecule (R)-roscovitine in complex with the cyclin-dependent kinase, CDK5. The starting pdb file can be downloaded from the Protein Data Bank (PDB code: [1UNL](https://www.rcsb.org/structure/1UNL)).
+
+Software needed to complete this tutorial:
+
+[GROMACS](2019-08-01-gromacs) <br/>
+[AmberTools](https://ambermd.org/AmberTools.php) <br/>
 
 ### Prepare starting pdb files ###
 

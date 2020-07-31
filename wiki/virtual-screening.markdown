@@ -4,7 +4,7 @@ date:   2019-07-03
 layout: "git-wiki-post"
 ---
 
-Molecular Docking
+## Molecular Docking ##
 
 ### About this tutorial ###
 

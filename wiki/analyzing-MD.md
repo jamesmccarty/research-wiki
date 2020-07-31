@@ -4,7 +4,7 @@ date:   2019-07-03
 layout: "git-wiki-post"
 ---
 
-Analyzing a MD Trajectory
+## Analyzing a MD Trajectory ##
 
 ### About this tutorial
 
