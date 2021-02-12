@@ -360,10 +360,10 @@ After the NVT simulation has completed, we will perform a 50 ps NPT equilibratio
 After looking at the [cp2k_equil_npt.inp](https://github.com/jamesmccarty/QMMM-protein/blob/master/cp2k_equil_npt.inp) input file, run the NPT simulation with
 
 {% highlight git %}
-cp2k.sopt cp2k_equil_npt.inp > nvt.out
+cp2k.sopt cp2k_equil_npt.inp > npt.out
 {% endhighlight %}
 
-At the end of this NPT equilibration we are now ready to move to a QM/MM simulation.
+At the end of this NPT equilibration we are now ready to move to a QM/MM simulation. Make sure to update your CP2k input files to use the final equilibrated box coordinates from the NPT equilibration. The cell dimensions are printed in the *NPT-1.cell* file.   
 
 ### Adding missing LJ parameters ###
 
