@@ -49,7 +49,7 @@ Usually, we will want to add small molecule ions (NaCl) in order to neutralize t
 To produce a .tpr file, we need an additional input file with extension .mdp (molecular dynamics parameter file) that contains specified parameters for running a simulation. For this tutorial, you can use the [ions.mdp](https://github.com/jamesmccarty/GROMACS_parameter_files/blob/master/ions.mdp) file. We then generate the .tpr file as follows:
 
 {% highlight git %}
-gmx grompp -f ions.mdp -c 1ubq_solv.gro -p 1ubq.top -o ions.tpr
+gmx grompp -f ions.mdp -c 1ubq_solv.gro -p 1ubq.top -o ions.tpr -maxwarn 1
 {% endhighlight %}
 
 where -o specifies the output .tpr file which we have called ions.tpr. We have now generated a compiled file called ions.tpr. Now we can add small ions with the command
@@ -71,10 +71,10 @@ gmx grompp -f em.mdp -c 1ubq_solv_ions.gro -p 1ubq.top -o em.tpr
 where -o signals the output em.tpr file. Now to run the energy minimization we use the Gromacs mdrun command
 
 {% highlight git %}
-gmx mdrun -v -deffnm em
+gmx mdrun -v -s em.tpr -o em.trr -x em.xtc -c em.gro -e em.edr -g em.log
 {% endhighlight %}
 
-The -v flag means "verbose" and means that Gromacs will print to the screen the minimization process each step. The -deffnm flag signals to make all output files the same name as the input file, here "em". The output files will be em.log (ASCII-text log file), em.edr (binary energy file), em.trr (binary full-precision trajectory), and em.gro (the final energy minimized structure). It is a good idea to check how the total potential energy changes during the minimization. We can used the generated em.edr file for this analysis.
+The -v flag means "verbose" and means that Gromacs will print to the screen the minimization process each step. The -o flag signals to output a trajectory file (binary full-precision trajectory), the -x signals to output a compressed trajectory file, the -c signals to output the final frame of the energy minimization as a .gro file. This structure will be used in the next step for running the MD simulation. The -e outputs an energy file (binary final) and the -g outputs the log file (ASCII-text log file). It is a good idea to check how the total potential energy changes during the minimization. We can used the generated em.edr file for this analysis.
 
 {% highlight git %}
 gmx energy -f em.edr -o potential.xvg
@@ -118,7 +118,7 @@ pcoupl = no: Pressure coupling is not applied.
 Finally we can run the molecular dynamics as follows
 
 {% highlight git %}
-gmx mdrun -v -deffnm nvt
+gmx mdrun -v -s nvt.tpr -o nvt.trr -x nvt.xtc -cpo nvt.cpt -c nvt.gro -e nvt.edr -g nvt.log  
 {% endhighlight %}
 
 When the equilibration is finished you can analyze the temperature progression
@@ -146,10 +146,10 @@ The previous step, NVT equilibration, stabilized the temperature of the system. 
 Again we use the grompp command:
 
 {% highlight git %}
-gmx grompp -f npt.mdp -c nvt.gro -p 1ubq.top -o npt.tpr -r nvt.gro
+gmx grompp -f npt.mdp -c nvt.gro -t nvt.cpt -p 1ubq.top -o npt.tpr -r nvt.gro
 {% endhighlight %}
 
-where *nvt.gro* is the final structure from the above nvt equilibration. Note here we no longer include the  position restraint on the protein. Additionally, in the *npt.mdp* file we have added the Parrinello-Rahman barostat
+where *nvt.gro* is the final structure from the above nvt equilibration. Note here we no longer include the  position restraint on the protein. Additionally, we have included the -t flag to start the simulation from the previous nvt checkpoint file *nvt.cpt*. When a checkpoint file is available, it is preferable to read it in with the -t flag. When both the -t and -c flag are present, Gromacs checks for the checkpoint file first, and if it is not found, then it will fall back to the structure file provided with -c. In the *npt.mdp* file we have added the Parrinello-Rahman barostat
 
 {% highlight git %}
 pcoupl      = Parrinello-Rahman   ; Pressure coupling is applied.
@@ -162,7 +162,7 @@ compressibility = 4.5e-5          ; isothermal compressibility of water, bar^-1
 Again we run the molecular dynamics as follows:
 
 {% highlight git %}
-gmx mdrun -v -deffnm npt
+gmx mdrun -v -s npt.tpr -o npt.trr -x npt.xtc -cpo npt.cpt -c npt.gro -e npt.edr -g npt.log  
 {% endhighlight %}
 
 When the run is finished you can analyze the pressure fluctuations
@@ -203,13 +203,31 @@ This is a short production run for this tutorial. For an actual production run, 
 Again, we use the grompp command:
 
 {% highlight git %}
-gmx grompp -f production_nvt.mdp -c npt.gro -p 1ubq.top -o production_nvt.tpr -r npt.gro
+gmx grompp -f production_nvt.mdp -c npt.gro -t npt.cpt -p 1ubq.top -o production_nvt.tpr -r npt.gro
 {% endhighlight %}
 
-where *npt.gro* is the final structure from the above npt equilibration. And we run the production molecular dynamics as follows:
+where *npt.gro* is the final structure from the above NPT equilibration and *npt.cpt* is the checkpoint file from the above NPT equilibration. And we run the production molecular dynamics as follows:
 
 {% highlight git %}
-gmx mdrun -v -deffnm production_nvt
+gmx mdrun -v -s production_nvt.tpr -o production_nvt.trr -x production_nvt.xtc -cpo production_nvt.cpt -c production_nvt.gro -e production_nvt.edr -g porduction_nvt.log  
 {% endhighlight %}
 
-This may take some time if running on a personal PC. Once it is finished you can check out the Analyzing a MD trajectory tutorial.
+This may take some time if running on a personal PC. Once it is finished you can check out the [Analyzing a MD trajectory tutorial](analyzing-MD).
+
+### Extending a simulation run
+
+To extend a simulation we can modify the .tpr file by using *convert-tpr*. For example, to extend the simulation to 10 ns type:
+
+{% highlight git %}
+gmx convert-tpr -s production_nvt.tpr -extend 10000 -o production_nvt.tpr
+{% endhighlight %}
+
+The -extend flag signals how much time (in ps) to extend the simulation. This above command will extend the simulation to a total simulation time of 10 ns. In this case, it is import to continue the simulation from a checkpoint file using the -cpi flag.
+
+{% highlight git %}
+gmx mdrun -v -s production_nvt.tpr -cpi production_nvt.cpt -x production_nvt.xtc -cpo production_nvt.cpt -c production_nvt.gro -e production_nvt.edr -g porduction_nvt.log
+{% endhighlight %}
+
+Here the -cpi production_nvt.cpt signals to continue from the most recent checkpoint file. The remaining outputs will be appended to the previous outputs by default unless the -noappend option is used.
+
+The same command as above can be used to restart a previous simulation from the most recent checkpoint.
