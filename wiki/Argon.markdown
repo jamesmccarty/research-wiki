@@ -130,10 +130,10 @@ The -s flag signals the input binary run input file. The rest of the flags indic
 During this 100 ps simulation, the Argon atoms should melt from the lattice structure and become a liquid. The temperature should equilibrate to 94.4 K and the potential energy should reach a stable equilibrium. To check the temperature and energy, we can look at the instantaneous quantities in the md_run1.edr file. To check the temperature:
 
 {% highlight git %}
-gmx energy -f md_run1.edr -o temperature.dat -xvg none
+gmx energy -f md_run1.edr -o temperature.xvg -xvg none
 {% endhighlight %}
 
-Type "8 0" at the prompt to select the temperature and hit enter. The temperature.dat file will have the time vs. temperature over the course of the simulation. You can plot this with any plotting tool. For example, in xmgrace:
+Type "8 0" at the prompt to select the temperature and hit enter. The temperature.xvg file will have the time vs. temperature over the course of the simulation. You can plot this with any plotting tool. For example, in xmgrace:
 
 {% highlight git %}
 xmgrace temperature.dat  
@@ -143,7 +143,7 @@ See if you can repeat this procedure to plot the potential energy. Does the pote
 
 #### Extending the Simulation
 
-The first run was to melt the Argon atoms from the lattice and generate an equilibrated liquid at 94.4 K. Now we can run a longer simulation that we can use to compute properties of the liquid. Have a look at the MD parameter file: [Ar_nvt.mdp](). This file should look very similar to the previous MD parameter file with a few exceptions. First, we specify that this will be a continuation from a previous simulation. Second, we are no longer generating velocities since we are continuing from our previous simulation.
+The first run was to melt the Argon atoms from the lattice and generate an equilibrated liquid at 94.4 K. Now we can run a longer simulation that we can use to compute properties of the liquid. Have a look at the MD parameter file: [Ar_nvt.mdp](https://github.com/jamesmccarty/LiquidArgon/blob/main/Ar_nvt.mdp). This file should look very similar to the previous MD parameter file with a few exceptions. First, we specify that this will be a continuation from a previous simulation. Second, we are no longer generating velocities since we are continuing from our previous simulation.
 
 Now we run the GROMACS preprocessor to generate a new binary run input file for the longer simulation:
 
