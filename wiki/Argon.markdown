@@ -33,6 +33,7 @@ Files to complete this tutorial can accessed here:<br/>
 
 Introductory video about MD simulations to accompany this tutorial:<br/>
 [Video: Molecular Simulation](https://wwu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=5f99a5a3-1af6-4237-8623-aeba01874c2c)<br/>
+[Video: Practical Exercise](https://wwu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=c3c44d5d-4fce-4bdd-b6d1-aebb0023b63f)<br/>
 
 ### MD simulation of argon
 
