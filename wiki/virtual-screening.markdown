@@ -17,6 +17,7 @@ Software needed to complete this tutorial:
 [PyMol](https://pymol.org/2/)<br/>
 [Open Babel](http://openbabel.org/wiki/Main_Page)<br/>
 [iDock](https://github.com/HongjianLi/idock/releases)<br/>
+[Smina]
 
 ### Background ###
 

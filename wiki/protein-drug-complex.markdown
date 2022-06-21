@@ -147,7 +147,7 @@ gmx solvate –cp complex_newbox.gro –cs spc216.gro –o complex_solv.gro –p
 We also add ions as before using the [ions.mdp](https://github.com/jamesmccarty/Protein-Ligand-Complex/blob/master/ions.mdp) file:
 
 {% highlight git %}
-gxm grompp –f ions.mdp –c complex_solv.gro –p complex.top -o ions.tpr -maxwarn 1
+gmx grompp –f ions.mdp –c complex_solv.gro –p complex.top -o ions.tpr -maxwarn 1
 
 gmx genion -s ions.tpr -o complex_solv_ions.gro -p complex.top -conc 0.15 -neutral
 {% endhighlight git %}
