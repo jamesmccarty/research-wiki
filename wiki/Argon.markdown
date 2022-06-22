@@ -136,7 +136,7 @@ gmx energy -f md_run1.edr -o temperature.xvg -xvg none
 Type "8 0" at the prompt to select the temperature and hit enter. The temperature.xvg file will have the time vs. temperature over the course of the simulation. You can plot this with any plotting tool. For example, in xmgrace:
 
 {% highlight git %}
-xmgrace temperature.dat  
+xmgrace temperature.xvg 
 {% endhighlight %}
 
 See if you can repeat this procedure to plot the potential energy. Does the potential energy reach a stable equilibrium?
