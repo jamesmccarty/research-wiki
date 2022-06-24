@@ -213,3 +213,14 @@ gmx mdrun -v -deffnm production_nvt
 {% endhighlight %}
 
 This may take some time if running on a personal PC. Once it is finished you can check out the Analyzing a MD trajectory tutorial.
+
+To run the job in the background in Linux, use the *nohup* command:
+{% highlight git %}
+nohup gmx mdrun -v -deffnm production_nvt >& nohup.log &
+{% endhighlight %}
+
+This will run the calculation in the background. Don't forget to check the *nohup.log* file for any errors. Monitor the simulation progress using:
+
+{% highlight git %}
+tail -f nohup.log
+{% endhighlight %}
