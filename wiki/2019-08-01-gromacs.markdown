@@ -17,7 +17,7 @@ First we must download a protein structure file (pdb text file) from the RCSB [w
 We first need to convert this pdb file to a format that Gromacs uses. The Gromacs command *pdb2gmx* will generate a Gromacs topology file (.top), a position restraint file (posre.itp), and a Gromacs structure file (.gro). Generating a topology file can sometimes be tricky if there are missing atoms, non-standard amino acids, or small molecules in the pdb file. A basic usage of *pdb2gmx* is
 
 {% highlight git %}
-$ gmx pdb2gmx –f 1ubq.pdb –o 1ubq.gro -p 1ubq.top –ignh
+$ gmx pdb2gmx -f 1ubq.pdb -o 1ubq.gro -p 1ubq.top -ignh
 {% endhighlight %}
 
 where -f signals the input pdb file, here called 1ubq.pdb and -o is the output structure file and -p is the output topology file. The flag -ignh means to ignore H atoms in the PDB file. The -ignh flag is useful to deal with non-conventional naming of H atoms in pdb files; however, if you need to persevere the exact position of the H coordinates in the structure file, then you should not use the -ignh flag.
@@ -31,7 +31,7 @@ The topology file *1ubq.top* contains all the information necessary to define th
 Next, we define and create a simulation box of specified dimensions using the *editconf* command
 
 {% highlight git %}
-$ gxm editconf –f 1ubq.gro –o 1ubq_newbox.gro –c –d 1.0 –bt cubic
+$ gxm editconf -f 1ubq.gro -o 1ubq_newbox.gro -c -d 1.0 -bt cubic
 {% endhighlight %}
 
 The -f flag signals the input Gromacs structure file which we created above. The -o signals the new output structure file which contains the box definition. The -c flag centers the protein in the box, and the -d specifies a minimum distance from the protein to the edge of the box (in nm). Specifying a solute-box distance of 1.0 nm means that there are at least 2.0 nm between any two periodic images of a protein. This distance will be sufficient for just about any cutoff scheme commonly used in simulations. The -bt cubic flag indicates to use a cubic box shape. Now that we have generated a simulation box, which we must fill with water. We add solvent by typing
@@ -71,7 +71,15 @@ gmx grompp -f em.mdp -c 1ubq_solv_ions.gro -p 1ubq.top -o em.tpr
 where -o signals the output em.tpr file. Now to run the energy minimization we use the Gromacs mdrun command
 
 {% highlight git %}
-gmx mdrun -v -deffnm em
+gmx mdrun -v -s em.tpr -o em.trr -x em.xtc -cpo em.cpt -c em.gro -e em.edr -g em.log  
+{% endhighlight %}
+
+Here the -o signals the output full precision trajectory, the -x a compressed trajectory, the -cpo outputs a checkpoint file, the -c the output structure file, the -e signals the output energy file, and -g the output log file.
+
+An alternative, abbreviated command you can use instead is to use the -deffnm flag to signal a default file name for all output files:
+
+{% highlight git %}
+gmx mdrun -v -s em.tpr -deffnm em
 {% endhighlight %}
 
 The -v flag means "verbose" and means that Gromacs will print to the screen the minimization process each step. The -deffnm flag signals to make all output files the same name as the input file, here "em". The output files will be em.log (ASCII-text log file), em.edr (binary energy file), em.trr (binary full-precision trajectory), and em.gro (the final energy minimized structure). It is a good idea to check how the total potential energy changes during the minimization. We can used the generated em.edr file for this analysis.
@@ -118,7 +126,7 @@ pcoupl = no: Pressure coupling is not applied.
 Finally we can run the molecular dynamics as follows
 
 {% highlight git %}
-gmx mdrun -v -deffnm nvt
+gmx mdrun -v -s nvt.tpr -deffnm nvt
 {% endhighlight %}
 
 When the equilibration is finished you can analyze the temperature progression
@@ -141,15 +149,15 @@ Here we can see that over the course of the 1 ps equilibration run, the temperat
 
 ### Additional Equilibration Runs
 
-The previous step, NVT equilibration, stabilized the temperature of the system. If we want to perform the simulation in the NVT ensemble at a particular density, we also need to perform an equilibration in the NPT ensemble at a specified temperature and pressure to allow the system density to reach its equilibrated value. This can be done using the mdp file [npt.mdp](https://github.com/jamesmccarty/GROMACS_parameter_files/blob/master/npt.mdp)
+The previous step, NVT equilibration, stabilized the temperature of the system. If we want to perform the simulation in the NPT ensemble at a particular density, we also need to perform an equilibration in the NPT ensemble at a specified temperature and pressure to allow the system density to reach its equilibrated value. This can be done using the mdp file [npt.mdp](https://github.com/jamesmccarty/GROMACS_parameter_files/blob/master/npt.mdp)
 
 Again we use the grompp command:
 
 {% highlight git %}
-gmx grompp -f npt.mdp -c nvt.gro -p 1ubq.top -o npt.tpr -r nvt.gro
+gmx grompp -f npt.mdp -c nvt.gro -p 1ubq.top -o npt.tpr -r nvt.gro -t nvt.cpt
 {% endhighlight %}
 
-where *nvt.gro* is the final structure from the above nvt equilibration. Note here we no longer include the  position restraint on the protein. Additionally, in the *npt.mdp* file we have added the Parrinello-Rahman barostat
+where *nvt.gro* is the final structure from the **previous** nvt equilibration, and the -t flag signals to use the velocities from the checkpoint file from our previous nvt equilibration (continuation run). Note here we no longer include the  position restraint on the protein. Additionally, in the *npt.mdp* file we have added the Parrinello-Rahman barostat
 
 {% highlight git %}
 pcoupl      = Parrinello-Rahman   ; Pressure coupling is applied.
@@ -162,7 +170,7 @@ compressibility = 4.5e-5          ; isothermal compressibility of water, bar^-1
 Again we run the molecular dynamics as follows:
 
 {% highlight git %}
-gmx mdrun -v -deffnm npt
+gmx mdrun -v -s npt.tpr -deffnm npt
 {% endhighlight %}
 
 When the run is finished you can analyze the pressure fluctuations
@@ -187,6 +195,8 @@ Often you will perform several equilibration steps to reach the desired target e
 
 ![]({{ site.url }}{{ site.baseurl }}/images/equilscheme.png){: style="width: 600px; border: 10px"}
 
+**Note: the NPT equilibration here is short for the purpose of this tutorial. In practice, you should run a longer equilibration in the NPT ensemble and make sure the system is properly equilibrated by checking the RMSD**
+
 ### Production Run
 
 Once the system has been equilibrated we can run a longer production run. Here we will perform the simulation in the NVT ensemble using the following mdp file [production_nvt.mdp](https://github.com/jamesmccarty/GROMACS_parameter_files/blob/master/production_nvt.mdp)
@@ -198,25 +208,25 @@ nsteps		= 2500000	; 2 * 2500000 = 50000 ps (5 ns)
 dt		    = 0.002		; 2 fs
 {% endhighlight %}
 
-This is a short production run for this tutorial. For an actual production run, you would need to run the simulation for much longer.
+**This is a short production run for this tutorial. For an actual production run, you would need to run the simulation for much longer.**
 
 Again, we use the grompp command:
 
 {% highlight git %}
-gmx grompp -f production_nvt.mdp -c npt.gro -p 1ubq.top -o production_nvt.tpr -r npt.gro
+gmx grompp -f production_nvt.mdp -c npt.gro -p 1ubq.top -o production_nvt.tpr -r npt.gro -t npt.cpt
 {% endhighlight %}
 
-where *npt.gro* is the final structure from the above npt equilibration. And we run the production molecular dynamics as follows:
+where *npt.gro* is the final structure from the above npt equilibration and *npt.cpt* is the checkpoint file from the previous npt equilibration. And we run the production molecular dynamics as follows:
 
 {% highlight git %}
-gmx mdrun -v -deffnm production_nvt
+gmx mdrun -v -s production_nvt.tpr -deffnm production_nvt
 {% endhighlight %}
 
 This may take some time if running on a personal PC. Once it is finished you can check out the Analyzing a MD trajectory tutorial.
 
 To run the job in the background in Linux, use the *nohup* command:
 {% highlight git %}
-nohup gmx mdrun -v -deffnm production_nvt >& nohup.log &
+nohup gmx mdrun -v -s production_nvt.tpr -deffnm production_nvt >& nohup.log &
 {% endhighlight %}
 
 This will run the calculation in the background. Don't forget to check the *nohup.log* file for any errors. Monitor the simulation progress using:
@@ -224,3 +234,25 @@ This will run the calculation in the background. Don't forget to check the *nohu
 {% highlight git %}
 tail -f nohup.log
 {% endhighlight %}
+
+### Extending the simulation time
+
+Often we need to extend a simulation to add more time to the trajectory. For example, let's say you have run a simulation for 100 ns and now want to extend the run to 200 ns. This can be done using the *convert-tpr* command. For example, if you want to extend the *production_nvt.tpr* file by 100 ns (100,000 ps), you can create a new tpr file using:
+
+{% highlight git %}
+gmx convert-tpr -s production_nvt.tpr -o production_nvt_run2.tpr -extend 100000
+{% endhighlight %}
+
+Here the -extend signals how long to extend the simulation (in ps). Then, you can run the extended simulation using the checkpoint file:
+
+{% highlight git %}
+gmx mdrun -v -s production_nvt_run2.tpr -cpi production_nvt.cpt -deffnm production_nvt_run2 -noappend
+{% endhighlight %}
+
+Note the -cpi signals to continue from the most recent checkpoint file from our previous simulation. The -noappend signals to not append to the previous outputs. In this case, you will get new output files with the prefix production_nvt_run2. Instead, if you want to append to the previous output files to generate one long continuous run, you can use:
+
+{% highlight git %}
+gmx mdrun -s production_nvt_run2.tpr -cpi production_nvt.cpt -deffnm production_nvt
+{% endhighlight %}
+
+This will append the outputs to the previous production_nvt output files. Note that if you used the -deffnm in your original run, and you want appending, then your continuations must also use -deffnm. Appending will not work if any output files have been modified or removed after the mdrun wrote them.
